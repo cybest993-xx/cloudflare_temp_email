@@ -54,6 +54,11 @@ jobs:
           cd worker/
           # ✅ 修复核心：使用环境变量写入，避免 Shell 解析特殊字符
           printf '%s\n' "$WRANGLER_TOML_CONTENT" > wrangler.toml
+          if grep -qE '^[[:space:]]*keep_vars[[:space:]]*=' wrangler.toml; then
+            sed -i -E 's/^[[:space:]]*keep_vars[[:space:]]*=.*/keep_vars = true/' wrangler.toml
+          else
+            sed -i '1ikeep_vars = true' wrangler.toml
+          fi
           
           pnpm install --no-frozen-lockfile
 
