@@ -53,7 +53,7 @@ const clearMails = async () => {
         <MailBox :key="mailBoxKey" :enableUserDeleteEmail="true" :fetchMailData="fetchMailData"
             :deleteMail="deleteMail" :showFilterInput="true">
             <template #desktop-toolbar-right>
-                <n-space class="mail-query-toolbar" align="center" :wrap="false">
+                <div class="mail-query-toolbar">
                     <n-input-group class="mail-query-group">
                         <n-input v-model:value="adminMailTabAddress" :placeholder="t('addressQueryTip')"
                             @keydown.enter="queryMail" clearable />
@@ -72,7 +72,7 @@ const clearMails = async () => {
                         </template>
                         {{ adminMailTabAddress ? t('clearAddressMailsTip', { address: adminMailTabAddress }) : t('clearAllMailsTip') }}
                     </n-popconfirm>
-                </n-space>
+                </div>
             </template>
         </MailBox>
     </div>
@@ -80,12 +80,18 @@ const clearMails = async () => {
 
 <style scoped>
 .mail-query-toolbar {
+    display: flex;
+    align-items: center;
     width: 100%;
+    min-width: 0;
+    gap: 8px;
     justify-content: flex-end;
+    flex-wrap: nowrap;
 }
 
 .mail-query-group {
-    flex: 1 1 420px;
-    max-width: 720px;
+    flex: 0 1 460px;
+    width: 460px;
+    min-width: 260px;
 }
 </style>

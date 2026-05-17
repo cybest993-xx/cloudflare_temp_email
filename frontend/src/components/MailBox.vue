@@ -137,6 +137,7 @@ const showMultiActionDownload = ref(false)
 const showMultiActionDelete = ref(false)
 const multiActionDownloadZip = ref({})
 const multiActionDeleteProgress = ref({ percentage: 0, tip: '0/0' })
+const multiActionDeleteCloseTimer = ref(null)
 
 const { t } = useScopedI18n('components.MailBox')
 
@@ -262,9 +263,13 @@ const multiActionSelectAll = (checked) => {
 }
 
 const multiActionDeleteMail = async () => {
+  clearTimeout(multiActionDeleteCloseTimer.value)
+  let selectedMailCount = 0
+  let completed = false
   try {
     loading.value = true;
     const selectedMails = data.value.filter((item) => item.checked);
+    selectedMailCount = selectedMails.length;
     if (selectedMails.length === 0) {
       message.error(t('pleaseSelectMail'));
       return;
@@ -283,11 +288,20 @@ const multiActionDeleteMail = async () => {
     }
     message.success(t("success"));
     await refresh();
+    completed = true;
   } catch (error) {
     message.error(error.message || "error");
   } finally {
     loading.value = false;
-    showMultiActionDelete.value = true;
+    if (selectedMailCount > 0) {
+      showMultiActionDelete.value = true;
+    }
+    if (completed && selectedMailCount > 0) {
+      multiActionDeleteCloseTimer.value = setTimeout(() => {
+        showMultiActionDelete.value = false;
+        multiActionDeleteCloseTimer.value = null;
+      }, 800);
+    }
   }
 }
 
@@ -323,6 +337,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   clearInterval(timer.value)
+  clearTimeout(multiActionDeleteCloseTimer.value)
 })
 </script>
 
@@ -571,7 +586,9 @@ onBeforeUnmount(() => {
 }
 
 .mailbox-toolbar-right {
-  flex: 0 1 760px;
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: flex-end;
   min-width: 320px;
   margin-left: auto;
 }
